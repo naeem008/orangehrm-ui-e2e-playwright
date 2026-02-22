@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ohrm
+      MYSQL_USER: ohrm
+      MYSQL_PASSWORD: ohrm
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  orangehrm:
+    image: orangehrm/orangehrm:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: ohrm
+      DB_USER: ohrm
+      DB_PASSWORD: ohrm
+    ports:
+      - "8080:80"
+    restart: on-failure
