@@ -12,7 +12,7 @@ export class LeaveTypeListPage {
         this.configureMenu = page.getByText('Configure');
         this.leaveTypesOption = page.getByRole('menuitem', { name: 'Leave Types' });
         this.addBtn = page.getByRole('button', { name: 'Add' });
-        
+
         // Cleaned up the 'Yes, Delete' button from your codegen
         this.confirmDeleteBtn = page.getByRole('button', { name: 'Yes, Delete' });
     }
@@ -30,7 +30,7 @@ export class LeaveTypeListPage {
     async clickEditForLeaveType(leaveName: string) {
         // Find the exact row that contains our leave name
         const targetRow = this.page.getByRole('row', { name: leaveName });
-        
+
         // Find all buttons inside that specific row and click the second one (Edit/Pencil)
         await targetRow.locator('button').nth(1).click();
     }
@@ -38,7 +38,7 @@ export class LeaveTypeListPage {
     // Find specific row by Name, then click its Delete button
     async clickDeleteForLeaveType(leaveName: string) {
         const targetRow = this.page.getByRole('row', { name: leaveName });
-        
+
         // Click the first button (Delete/Trash) inside that specific row
         await targetRow.locator('button').nth(0).click();
     }
