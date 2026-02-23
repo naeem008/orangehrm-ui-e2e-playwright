@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { NavbarPage } from '../pages/navbar.page';
-import { LeaveTypeListPage } from '../pages/Leave/leave-type-list';
+import { LeaveTypeListPage } from '../pages/leave/leave-type-list.page';
 import { LeaveTypeFormPage } from '../pages/Leave/leave-type-form.page';
 
 // This setup function creates a new Leave Type and returns the generated data
