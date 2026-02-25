@@ -1,0 +1,12 @@
+=========================================
+          MOCK EXPENSE RECEIPT
+=========================================
+Invoice ID  : INV-2026-FEB-001
+Date        : 2026-02-25
+Category    : Travel/Accommodation
+Amount      : 500 BDT
+Status      : Paid via Corporate Card
+=========================================
+Note: This is an automated test attachment 
+generated for OrangeHRM E2E Testing.
+=========================================
