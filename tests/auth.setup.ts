@@ -2,27 +2,28 @@ import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 
-// 🛡️ Global path definition for cross-platform compatibility
 const AUTH_FILE_PATH = path.join('playwright', '.auth', 'admin.json');
 
 test('setup: create admin storageState', async ({ page }) => {
     const username = process.env.ADMIN_USERNAME;
     const password = process.env.ADMIN_PASSWORD;
+    const rawBaseUrl = process.env.BASE_URL;
 
-    // 1. 🚀 PRO APPROACH: Safely get the BASE_URL from .env or fallback to local XAMPP url
-    const baseUrl = process.env.BASE_URL;
-
-    if (!username || !password || !baseUrl) {
-        throw new Error('❌ FATAL: ADMIN_USERNAME, ADMIN_PASSWORD, or BASE_URL missing in your .env file.');
+    // 1. 🛡️ STRICT FAIL-FAST: No Hardcoded URLs allowed!
+    if (!username || !password || !rawBaseUrl) {
+        throw new Error('❌ FATAL: ADMIN_USERNAME, ADMIN_PASSWORD, or BASE_URL is missing in environment variables.');
     }
 
-    console.log(`🚀 Navigating to base URL: ${baseUrl}`);
+    // 2. Safely remove trailing slash to prevent double-slash (//) bugs
+    const cleanBaseUrl = rawBaseUrl.replace(/\/$/, '');
 
-    // 2. Explicitly force Playwright to go to the correct URL
-    await page.goto(baseUrl);
+    // 3. Construct the exact Login URL
+    const loginUrl = `${cleanBaseUrl}/web/index.php/auth/login`;
 
-    // 3. Wait for OrangeHRM to redirect to the login page naturally
-    await page.waitForURL('**/auth/login');
+    console.log(`🚀 Navigating directly to: ${loginUrl}`);
+
+    // 4. 🛡️ SENIOR MOVE: Direct Navigation with Extended Timeout (60s) for Docker Cold Boot in CI
+    await page.goto(loginUrl, { timeout: 60000 });
 
     console.log('🔑 Filling credentials...');
     await page.getByRole('textbox', { name: 'Username' }).fill(username);
@@ -30,7 +31,6 @@ test('setup: create admin storageState', async ({ page }) => {
     await page.getByRole('button', { name: 'Login' }).click();
 
     console.log('⏳ Waiting for Dashboard and Auth Tokens...');
-    // 🛡️ State Readiness Check: Wait for the UI to fully load before saving state
     await expect(page).toHaveURL(/.*dashboard/);
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
