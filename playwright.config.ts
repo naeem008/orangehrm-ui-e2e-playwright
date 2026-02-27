@@ -6,7 +6,7 @@ dotenv.config();
 const isCI = !!process.env.CI;
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './',
   fullyParallel: true,
   workers: isCI ? 2 : 4,
   retries: isCI ? 1 : 0,
