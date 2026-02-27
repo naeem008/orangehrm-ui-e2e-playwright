@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:5.7
+    # 🛡️ THE FIX: Switched from mysql:5.7 to mariadb to match your local XAMPP setup
+    image: mariadb:10.6
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ohrm
@@ -11,10 +12,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      # 🛡️ SENIOR MOVE: Mount your local DB dump to auto-seed the CI database on boot
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      # 🛡️ FIX: Added credentials so the ping actually works inside the container
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
@@ -26,11 +25,11 @@ services:
       db:
         condition: service_healthy
     environment:
-      # Standard variables for OrangeHRM docker connections
-      ORANGEHRM_DATABASE_HOST: db
-      ORANGEHRM_DATABASE_USER: ohrm
-      ORANGEHRM_DATABASE_PASSWORD: ohrm
-      ORANGEHRM_DATABASE_NAME: ohrm
+      # Reverted to your original standard variables to ensure connection
+      DB_HOST: db
+      DB_NAME: ohrm
+      DB_USER: ohrm
+      DB_PASSWORD: ohrm
     ports:
       - "8080:80"
     restart: on-failure
