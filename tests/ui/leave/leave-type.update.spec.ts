@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { createLeaveType } from '../../../setups/leave-type.setup';
 import { LeaveTypeListPage } from '../../../pages/leave/leave-type-list.page';
-import { LeaveTypeFormPage } from '../../../pages/Leave/leave-type-form.page';
+import { LeaveTypeFormPage } from '../../../pages/leave/leave-type-form.page';
 
 test.describe('Leave - Leave Type Update', () => {
     test.beforeEach(async ({ page }) => {
