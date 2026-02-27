@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee } from '../../setups/employee.setup';
-import { EmployeeListPage } from '../../pages/pim/employee-list.page';
+import { createEmployee } from '../../../setups/employee.setup';
+import { EmployeeListPage } from '../../../pages/pim/employee-list.page';
 
 test.describe('PIM - Employee Delete', () => {
-
     test.beforeEach(async ({ page }) => {
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
     });
@@ -17,7 +16,9 @@ test.describe('PIM - Employee Delete', () => {
         console.log('------------------------------------------------');
 
         // 2. NAVIGATE & SEARCH
-        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, {
+            waitUntil: 'domcontentloaded',
+        });
         const employeeList = new EmployeeListPage(page);
 
         console.log(`[ACTION] Searching for ID: ${employeeData.employeeId} to perform deletion...`);
@@ -35,10 +36,14 @@ test.describe('PIM - Employee Delete', () => {
         console.log(`[SUCCESS] Toast message "Successfully Deleted" verified.`);
 
         // 4. VERIFY (Double Validation - Senior Level Practice)
-        console.log(`[VERIFICATION] Re-searching ID: ${employeeData.employeeId} to ensure it is wiped from the database.`);
+        console.log(
+            `[VERIFICATION] Re-searching ID: ${employeeData.employeeId} to ensure it is wiped from the database.`
+        );
 
         // Navigating again to ensure a fresh UI state without cache
-        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, {
+            waitUntil: 'domcontentloaded',
+        });
         await employeeList.searchByEmployeeId(employeeData.employeeId);
 
         // Verify "No Records Found" message is visible
@@ -48,5 +53,4 @@ test.describe('PIM - Employee Delete', () => {
         console.log(`[RESULT] Employee perfectly deleted! "No Records Found" verified.`);
         console.log('------------------------------------------------');
     });
-
 });

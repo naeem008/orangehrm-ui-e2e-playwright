@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import { createLeaveType } from '../../../setups/leave-type.setup';
 
 test.describe('Leave - Leave Type Create', () => {
-
     test.beforeEach(async ({ page }) => {
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
     });

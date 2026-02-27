@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee } from '../../setups/employee.setup';
-import { EmployeeListPage } from '../../pages/pim/employee-list.page';
+import { createEmployee } from '../../../setups/employee.setup';
+import { EmployeeListPage } from '../../../pages/pim/employee-list.page';
 
 test.describe('PIM - Employee Read (Search)', () => {
-
     test.beforeEach(async ({ page }) => {
         // Navigate to Dashboard before each test using absolute URL for stability
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
@@ -24,7 +23,9 @@ test.describe('PIM - Employee Read (Search)', () => {
         console.log('------------------------------------------------');
 
         // 2. NAVIGATE: Go to the Employee List page
-        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, {
+            waitUntil: 'domcontentloaded',
+        });
 
         // 3. READ/SEARCH: Use the Page Object to perform search
         const employeeList = new EmployeeListPage(page);
@@ -39,5 +40,4 @@ test.describe('PIM - Employee Read (Search)', () => {
         console.log(`>>> SUCCESS: Employee "${employeeData.firstName}" found in the list!`);
         console.log('------------------------------------------------');
     });
-
 });

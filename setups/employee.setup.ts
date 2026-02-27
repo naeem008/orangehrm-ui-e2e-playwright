@@ -21,7 +21,7 @@ export async function createEmployee(page: Page) {
 
     // 1. Generate 100% random First and Last names
     const firstName = getRandomName(7); // Generates a random 7-letter name
-    const lastName = getRandomName(8);  // Generates a random 8-letter name
+    const lastName = getRandomName(8); // Generates a random 8-letter name
     const employeeId = Date.now().toString().slice(-6);
 
     // 2. Execute Flow

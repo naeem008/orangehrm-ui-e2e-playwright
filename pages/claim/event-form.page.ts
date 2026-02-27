@@ -1,6 +1,7 @@
 import { Page, Locator } from '@playwright/test';
 
-export class EventFormPage { // Ei nam-ta thaktei hobe
+export class EventFormPage {
+    // Ei nam-ta thaktei hobe
     readonly page: Page;
     readonly eventNameInput: Locator;
     readonly eventDescriptionInput: Locator;

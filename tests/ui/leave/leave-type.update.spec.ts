@@ -4,7 +4,6 @@ import { LeaveTypeListPage } from '../../../pages/leave/leave-type-list.page';
 import { LeaveTypeFormPage } from '../../../pages/Leave/leave-type-form.page';
 
 test.describe('Leave - Leave Type Update', () => {
-
     test.beforeEach(async ({ page }) => {
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
     });
@@ -56,5 +55,4 @@ test.describe('Leave - Leave Type Update', () => {
         console.log(`[SUCCESS] Verified new name in table: ${updatedLeaveName}`);
         console.log('------------------------------------------------');
     });
-
 });

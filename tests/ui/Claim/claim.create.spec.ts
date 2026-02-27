@@ -3,14 +3,13 @@ import { createEventSetup } from '../../../setups/event.setup';
 import { ClaimFormPage } from '../../../pages/claim/claim-form.page';
 
 test.describe('Claim - End-to-End Submission & Grid Verification', () => {
-
     test('Should verify total amount and find the record in My Claims grid', async ({ page }) => {
         const claimForm = new ClaimFormPage(page);
         const today = new Date().toISOString().split('T')[0];
 
         // 1. Navigation
         console.log(`[ACTION] Navigating to Dashboard...`);
-        await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'networkidle' });
+        await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
 
         // 2. Setup Prerequisite Event
         const eventData = await createEventSetup(page);
@@ -43,12 +42,13 @@ test.describe('Claim - End-to-End Submission & Grid Verification', () => {
 
         // 7. STEP 3: Verify in "My Claims" Grid
         console.log(`[ACTION] Checking for Event: ${eventData.eventName} in the grid...`);
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
 
         const tableRow = page.locator('.oxd-table-card').filter({ hasText: eventData.eventName });
 
         await expect(tableRow).toBeVisible();
         await expect(tableRow).toContainText('14,000.00');
+
         await expect(tableRow).toContainText(/Initiated|Submitted/);
 
         console.log(`[SUCCESS] Claim for ${eventData.eventName} verified in My Claims grid!`);

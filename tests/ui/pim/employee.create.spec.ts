@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee } from '../../setups/employee.setup';
+import { createEmployee } from '../../../setups/employee.setup';
 
 test.describe('PIM - Employee Management CRUD', () => {
-
     // Hook to run before each test in this block
     test.beforeEach(async ({ page }) => {
         // 1. Navigate to the dashboard before executing the test flow
@@ -15,11 +14,12 @@ test.describe('PIM - Employee Management CRUD', () => {
         const employeeData = await createEmployee(page);
 
         // Log the generated unique data for debugging purposes
-        console.log(`Created Employee: ${employeeData.firstName} ${employeeData.lastName} (ID: ${employeeData.employeeId})`);
+        console.log(
+            `Created Employee: ${employeeData.firstName} ${employeeData.lastName} (ID: ${employeeData.employeeId})`
+        );
 
         // 3. Assertions to validate successful creation
         await expect(page.getByRole('textbox', { name: 'First Name' })).toHaveValue(employeeData.firstName);
         await expect(page.getByRole('textbox', { name: 'Last Name' })).toHaveValue(employeeData.lastName);
     });
-
 });

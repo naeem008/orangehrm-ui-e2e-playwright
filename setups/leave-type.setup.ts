@@ -33,6 +33,6 @@ export async function createLeaveType(page: Page) {
 
     // Return the generated name so our tests can use it for Search, Update, or Delete
     return {
-        leaveName: uniqueLeaveName
+        leaveName: uniqueLeaveName,
     };
 }

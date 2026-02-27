@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import { LeaveTypeListPage } from '../../../pages/leave/leave-type-list.page';
 
 test.describe('Leave - Leave Type Read', () => {
-
     test.beforeEach(async ({ page }) => {
         // Start from the dashboard to ensure a clean state
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
@@ -31,5 +30,4 @@ test.describe('Leave - Leave Type Read', () => {
         console.log(`[SUCCESS] Leave Type list page is fully loaded and readable!`);
         console.log('------------------------------------------------');
     });
-
 });

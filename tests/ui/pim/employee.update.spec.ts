@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { createEmployee } from '../../setups/employee.setup';
-import { EmployeeListPage } from '../../pages/pim/employee-list.page';
+import { createEmployee } from '../../../setups/employee.setup';
+import { EmployeeListPage } from '../../../pages/pim/employee-list.page';
 
 test.describe('PIM - Employee Update', () => {
-
     test.beforeEach(async ({ page }) => {
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
     });
@@ -21,7 +20,9 @@ test.describe('PIM - Employee Update', () => {
         console.log('------------------------------------------------');
 
         // Step 3: Search the employee with the id number
-        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, {
+            waitUntil: 'domcontentloaded',
+        });
         const employeeList = new EmployeeListPage(page);
         await employeeList.searchByEmployeeId(employeeData.employeeId);
 
@@ -44,13 +45,15 @@ test.describe('PIM - Employee Update', () => {
         await expect(page.getByText('Successfully Updated')).toBeVisible();
 
         // Step 5: Match the update last name by finding the employee by ID again
-        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, { waitUntil: 'domcontentloaded' });
+        await page.goto(`${process.env.BASE_URL}/web/index.php/pim/viewEmployeeList`, {
+            waitUntil: 'domcontentloaded',
+        });
         await employeeList.searchByEmployeeId(employeeData.employeeId);
 
         // Extract Last Name from the grid (Row)
         const resultRow = page.locator('.oxd-table-card').first();
         await expect(resultRow).toBeVisible();
-        const actualLastNameInGrid = await resultRow.locator('div[role="cell"]').nth(3).innerText();
+        const actualLastNameInGrid = resultRow.locator('div[role="cell"]').nth(3);
 
         console.log('------------------------------------------------');
         console.log(`[STEP 5] Matching Updated Data from Grid`);
@@ -58,10 +61,9 @@ test.describe('PIM - Employee Update', () => {
         console.log(`[ACTUAL]   Last Name: ${actualLastNameInGrid}`);
 
         // The exact match assertion
-        expect(actualLastNameInGrid).toBe(updatedLastName);
+        await expect(actualLastNameInGrid).toHaveText(updatedLastName);
 
         console.log(`[RESULT] Match Successful! The Last Name was updated correctly.`);
         console.log('------------------------------------------------');
     });
-
 });

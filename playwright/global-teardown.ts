@@ -1,10 +1,18 @@
-import fs from 'fs';
+import { spawnSync } from "node:child_process";
+import path from "node:path";
+import fs from "node:fs";
 
-export default async function globalTeardown() {
-    const sessionPath = 'playwright/.auth/admin.json';
+async function globalTeardown() {
+    if (process.platform !== "win32") return;
 
-    if (fs.existsSync(sessionPath)) {
-        fs.unlinkSync(sessionPath);
-        console.log('Session file (admin.json) deleted successfully during teardown.');
+    const XAMPP_DIR = process.env.XAMPP_DIR ?? "C:\\xampp";
+    const exePath = path.join(XAMPP_DIR, "xampp_stop.exe");
+
+    if (fs.existsSync(exePath)) {
+        console.log(`\n[TEARDOWN] Stopping XAMPP Server...`);
+        spawnSync(exePath, { cwd: XAMPP_DIR, stdio: "inherit" });
+        console.log(`[TEARDOWN] Server stopped gracefully.`);
     }
 }
+
+export default globalTeardown;

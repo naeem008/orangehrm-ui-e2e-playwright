@@ -19,7 +19,7 @@ export async function createEventSetup(page: Page) {
 
     // Ensure save is complete before returning
     await expect(page.getByText('Successfully Saved')).toBeVisible();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     return { eventName, description };
 }

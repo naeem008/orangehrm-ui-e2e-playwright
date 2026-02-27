@@ -3,7 +3,6 @@ import { createLeaveType } from '../../../setups/leave-type.setup';
 import { LeaveTypeListPage } from '../../../pages/leave/leave-type-list.page';
 
 test.describe('Leave - Leave Type Delete', () => {
-
     test.beforeEach(async ({ page }) => {
         // Ensuring we start from a clean state on the dashboard
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
@@ -37,5 +36,4 @@ test.describe('Leave - Leave Type Delete', () => {
         console.log(`[SUCCESS] Leave Type "${leaveData.leaveName}" has been deleted.`);
         console.log('------------------------------------------------');
     });
-
 });

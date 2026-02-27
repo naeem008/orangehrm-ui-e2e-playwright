@@ -11,15 +11,25 @@ export default defineConfig({
   workers: isCI ? 2 : 4,
   retries: isCI ? 1 : 0,
 
-  reporter: [['html', { outputFolder: 'playwright-report', open: 'never' }]],
-  outputDir: 'test-results',
+  // 🚀 Updated Reporter for Capstone Spec
+  reporter: [
+    ['monocart-reporter', {
+      name: 'OrangeHRM E2E Automation Report',
+      outputFile: './playwright-report/index.html'
+    }]
+  ],
 
+  // 🚀 SINGLE 'use' block for all global context settings
   use: {
     // 1. Global Base URL
     baseURL: process.env.BASE_URL,
 
     // 2. The most stable way to "maximize" in Playwright
     viewport: { width: 1920, height: 1080 },
+
+    // 3. Spec requires trace on failure
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure'
   },
 
   globalSetup: require.resolve('./playwright/global-setup'),
@@ -30,7 +40,6 @@ export default defineConfig({
       name: 'setup',
       testMatch: /.*\.setup\.ts/
     },
-
     {
       name: 'chromium',
       dependencies: ['setup'],

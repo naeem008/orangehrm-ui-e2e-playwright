@@ -1,27 +1,61 @@
-name: Playwright Tests
+name: OrangeHRM E2E CI
+
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 1. Start OrangeHRM Server via Docker
+    - name: Start OrangeHRM Docker Container
+      run: docker compose -f docker-compose.orangehrm.yml up -d
+
+    # 2. Wait for OrangeHRM to be ready
+    - name: Wait for Server Readiness
+      run: |
+        echo "Waiting for OrangeHRM to boot up..."
+        sleep 40 # Give MySQL and Apache time to start in CI
+
+    # 3. Setup Node.js
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: lts/*
-    - name: Install dependencies
+        node-version: 20
+
+    # 4. Install Dependencies
+    - name: Install Dependencies
       run: npm ci
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Run Playwright tests
+
+    # 5. Run Linter (Verifies your 0 errors!)
+    - name: Run ESLint
+      run: npm run lint
+
+    # 6. Run E2E Tests
+    - name: Run Playwright Tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+      env:
+        # Docker maps it to port 8080 by default in your yml
+        BASE_URL: http://localhost:8080/orangehrm-5.8 
+        ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+    # 7. Upload Monocart Report & Traces
+    - name: Upload Report Artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
       with:
-        name: playwright-report
+        name: monocart-report
         path: playwright-report/
-        retention-days: 30
+        retention-days: 14

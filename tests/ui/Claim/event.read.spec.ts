@@ -3,7 +3,6 @@ import { createEventSetup } from '../../../setups/event.setup';
 import { EventListPage } from '../../../pages/claim/event-list.page';
 
 test.describe('Claim - Event Management Read', () => {
-
     test.beforeEach(async ({ page }) => {
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
     });
@@ -27,5 +26,4 @@ test.describe('Claim - Event Management Read', () => {
         console.log(`[SUCCESS] Successfully read/verified UI visibility for: ${eventData.eventName}`);
         console.log('------------------------------------------------');
     });
-
 });

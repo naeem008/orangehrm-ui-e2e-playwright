@@ -4,7 +4,7 @@ export class EmployeeListPage {
     readonly page: Page;
     readonly addEmployeeTab: Locator;
 
-    readonly employeeIdInput: Locator
+    readonly employeeIdInput: Locator;
 
     // Locators for search functionality
     readonly employeeNameInput: Locator;
@@ -13,7 +13,10 @@ export class EmployeeListPage {
     constructor(page: Page) {
         this.page = page;
         this.addEmployeeTab = page.getByRole('link', { name: 'Add Employee' });
-        this.employeeIdInput = page.locator('div').filter({ hasText: /^Employee Id$/ }).locator('input');
+        this.employeeIdInput = page
+            .locator('div')
+            .filter({ hasText: /^Employee Id$/ })
+            .locator('input');
         // Locator for the Employee Name search box
         this.employeeNameInput = page.getByPlaceholder('Type for hints...').first();
 

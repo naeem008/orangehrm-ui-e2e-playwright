@@ -3,7 +3,6 @@ import { EventListPage } from '../../../pages/claim/event-list.page';
 import { EventFormPage } from '../../../pages/claim/event-form.page';
 
 test.describe('Claim - Event Management Create', () => {
-
     test.beforeEach(async ({ page }) => {
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
     });
@@ -35,5 +34,4 @@ test.describe('Claim - Event Management Create', () => {
         console.log(`[SUCCESS] Event "${eventName}" verified in the grid!`);
         console.log('------------------------------------------------');
     });
-
 });

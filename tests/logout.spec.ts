@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { NavbarPage } from '../../pages/navbar.page';
+import { NavbarPage } from '../pages/navbar.page';
 
 test.describe('Session Management', () => {
-
     test('Should successfully logout and destroy UI session', async ({ page }) => {
         // 1. Go to dashboard (Uses saved session from admin.json)
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
@@ -20,5 +19,4 @@ test.describe('Session Management', () => {
 
         console.log('UI Session destroyed successfully via Logout');
     });
-
 });

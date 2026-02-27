@@ -1,11 +1,26 @@
 {
   "scripts": {
-    "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "report": "playwright show-report"
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "report": "npx playwright show-report",
+    "format": "prettier --write \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\"",
+    "lint": "eslint \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" --fix"
   },
   "dependencies": {
     "@playwright/test": "^1.58.2",
     "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.2",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-playwright": "^2.7.1",
+    "eslint-plugin-prettier": "^5.5.5",
+    "monocart-reporter": "^2.10.0",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.56.1"
   }
 }

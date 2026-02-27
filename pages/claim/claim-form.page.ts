@@ -33,7 +33,10 @@ export class ClaimFormPage {
 
     // ... (previous addExpense and uploadAttachment methods remain same)
     async addExpense(type: string, date: string, amount: string) {
-        await this.page.locator('div.orangehrm-horizontal-padding:has-text("Expenses")').getByRole('button', { name: 'Add' }).click();
+        await this.page
+            .locator('div.orangehrm-horizontal-padding:has-text("Expenses")')
+            .getByRole('button', { name: 'Add' })
+            .click();
         await this.page.locator('.oxd-select-wrapper').click();
         await this.page.getByRole('option', { name: type }).click();
         await this.page.locator('input[placeholder="yyyy-mm-dd"]').fill(date);
@@ -43,10 +46,19 @@ export class ClaimFormPage {
     }
 
     async uploadAttachment(fileName: string) {
-        await this.page.locator('div.orangehrm-horizontal-padding:has-text("Attachments")').getByRole('button', { name: 'Add' }).click();
+        await this.page
+            .locator('div.orangehrm-horizontal-padding:has-text("Attachments")')
+            .getByRole('button', { name: 'Add' })
+            .click();
+
         const filePath = path.resolve(process.cwd(), 'test-data', fileName);
         await this.page.locator('input[type="file"]').setInputFiles(filePath);
+
         await this.page.getByRole('button', { name: 'Save' }).click();
         await expect(this.page.getByText('Successfully Saved')).toBeVisible();
+
+        // 🚀 THE FIX: Wait for the modal background overlay to completely disappear
+        // before allowing the script to proceed to the final Submit button.
+        await this.page.waitForSelector('.oxd-dialog-container-default', { state: 'hidden' });
     }
 }

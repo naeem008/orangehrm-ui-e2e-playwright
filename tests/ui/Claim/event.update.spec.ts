@@ -4,7 +4,6 @@ import { EventListPage } from '../../../pages/claim/event-list.page';
 import { EventFormPage } from '../../../pages/claim/event-form.page';
 
 test.describe('Claim - Event Management Update', () => {
-
     test.beforeEach(async ({ page }) => {
         await page.goto(`${process.env.BASE_URL}/web/index.php/dashboard/index`, { waitUntil: 'domcontentloaded' });
     });
@@ -44,5 +43,4 @@ test.describe('Claim - Event Management Update', () => {
         console.log(`[SUCCESS] Successfully updated and verified in grid: ${updatedEventName}`);
         console.log('------------------------------------------------');
     });
-
 });
