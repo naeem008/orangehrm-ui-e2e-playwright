@@ -12,7 +12,9 @@ export default defineConfig({
   retries: isCI ? 1 : 0,
 
   // 🚀 Updated Reporter for Capstone Spec
+  // 🚀 Updated Reporter for Capstone Spec
   reporter: [
+    ['list'], // Default console reporter
     ['monocart-reporter', {
       name: 'OrangeHRM E2E Automation Report',
       outputFile: './playwright-report/index.html'
