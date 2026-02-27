@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   db:
-    # 🛡️ THE FIX: Switched from mysql:5.7 to mariadb to match your local XAMPP setup
     image: mariadb:10.6
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -25,11 +24,12 @@ services:
       db:
         condition: service_healthy
     environment:
-      # Reverted to your original standard variables to ensure connection
-      DB_HOST: db
-      DB_NAME: ohrm
-      DB_USER: ohrm
-      DB_PASSWORD: ohrm
+      # 🛡️ THE FIX: Using the strictly required Official Docker variables for OrangeHRM
+      ORANGEHRM_DATABASE_HOST: db
+      ORANGEHRM_DATABASE_PORT: 3306
+      ORANGEHRM_DATABASE_NAME: ohrm
+      ORANGEHRM_DATABASE_USER: ohrm
+      ORANGEHRM_DATABASE_PASSWORD: ohrm
     ports:
       - "8080:80"
     restart: on-failure
