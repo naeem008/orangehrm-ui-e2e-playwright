@@ -33,7 +33,7 @@ CREATE TABLE `abstract_display_field` (
   `name` varchar(255) NOT NULL,
   `label` varchar(255) NOT NULL,
   `field_alias` varchar(255) DEFAULT NULL,
-  `is_sortable` varchar(10) NOT NULL,
+  `is_sortable` varchar(10) NOT NULL, 
   `sort_order` varchar(255) DEFAULT NULL,
   `sort_field` varchar(255) DEFAULT NULL,
   `element_type` varchar(255) NOT NULL,

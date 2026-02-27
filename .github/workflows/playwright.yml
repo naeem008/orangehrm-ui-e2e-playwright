@@ -15,56 +15,50 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # 1. Start OrangeHRM Server via Docker
     - name: Start OrangeHRM Docker Container
       run: docker compose -f docker-compose.orangehrm.yml up -d
 
-    # 2. 🛡️ SENIOR MOVE: Dynamic Health Check (Polling) instead of hard sleep
     - name: Wait for Server Readiness
       run: |
-        echo "🔄 Waiting for OrangeHRM container to fully boot up..."
-        for i in {1..30}; do
-          # Try to hit the login page and get the HTTP status code
+        echo "Waiting for OrangeHRM container to fully boot up..."
+        # Increased loop to 60 (5 minutes) to allow massive DB seeding
+        for i in {1..60}; do
           STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/web/index.php/auth/login || echo "000")
           
           if [ "$STATUS" = "200" ]; then
-            echo "✅ OrangeHRM is UP and responding with 200 OK!"
+            echo "OrangeHRM is UP and responding with 200 OK."
             exit 0
           fi
           
-          echo "⏳ Container still extracting/booting (Status: $STATUS). Waiting 5s... ($i/30)"
+          echo "Status: $STATUS. Container still booting/extracting DB. Waiting 5s... ($i/60)"
           sleep 5
         done
-        echo "❌ FATAL: OrangeHRM failed to boot within 2.5 minutes!"
+        
+        echo "FATAL: OrangeHRM failed to boot within 5 minutes. Fetching Docker logs:"
+        docker compose -f docker-compose.orangehrm.yml logs
         exit 1
 
-    # 3. Setup Node.js
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 20
 
-    # 4. Install Dependencies
     - name: Install Dependencies
       run: npm ci
 
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    # 5. Run Linter (Verifies your 0 errors!)
     - name: Run ESLint
       run: npm run lint
 
-    # 6. Run E2E Tests
     - name: Run Playwright Tests
       run: npx playwright test
       env:
-        # 🛡️ FIX: Removed the incorrect '/orangehrm-5.8' path for Docker environment
         BASE_URL: http://localhost:8080
         ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
         ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
-    # 7. Upload Monocart Report & Traces
     - name: Upload Report Artifacts
       if: always()
       uses: actions/upload-artifact@v4
