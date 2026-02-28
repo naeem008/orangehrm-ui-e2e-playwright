@@ -47,7 +47,7 @@ test.describe('PIM - Employee Delete', () => {
         await employeeList.searchByEmployeeId(employeeData.employeeId);
 
         // Verify "No Records Found" message is visible
-        const noRecordsMessage = page.getByText('No Records Found');
+        const noRecordsMessage = page.locator('.oxd-toast-content-text').filter({ hasText: 'No Records Found' });
         await expect(noRecordsMessage).toBeVisible();
 
         console.log(`[RESULT] Employee perfectly deleted! "No Records Found" verified.`);

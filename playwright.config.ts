@@ -6,42 +6,41 @@ dotenv.config();
 const isCI = !!process.env.CI;
 
 export default defineConfig({
+  // Global test directory for actual specs
   testDir: './tests',
   fullyParallel: true,
-  workers: isCI ? 2 : 4,
+  // Capstone spec: Parallel execution
+  workers: isCI ? 2 : 1,
   retries: isCI ? 1 : 0,
 
-  // 🚀 Updated Reporter for Capstone Spec
-  // 🚀 Updated Reporter for Capstone Spec
+  // Capstone spec: Monocart HTML reporter
   reporter: [
-    ['list'], // Default console reporter
+    ['list'],
     ['monocart-reporter', {
       name: 'OrangeHRM E2E Automation Report',
       outputFile: './playwright-report/index.html'
     }]
   ],
 
-  // 🚀 SINGLE 'use' block for all global context settings
   use: {
-    // 1. Global Base URL
     baseURL: process.env.BASE_URL,
-
-    // 2. The most stable way to "maximize" in Playwright
     viewport: { width: 1920, height: 1080 },
-
-    // 3. Spec requires trace on failure
+    // Capstone spec: Playwright trace on failure
     trace: 'retain-on-failure',
     video: 'retain-on-failure'
   },
 
-  globalSetup: require.resolve('./playwright/global-setup'),
-  globalTeardown: require.resolve('./playwright/global-teardown'),
+  // Capstone spec: Local Server Automation (Paths updated to match clean architecture)
+  globalSetup: require.resolve('./scripts/global-setup.ts'),
+  globalTeardown: require.resolve('./scripts/global-teardown.ts'),
 
   projects: [
     {
       name: 'setup',
-      testMatch: /.*\.setup\.ts/
+      testDir: './setups',
+      testMatch: 'auth.setup.ts' // 🛡️ CRITICAL FIX: Only auth setup is treated as a test file
     },
+    // Capstone spec: Multi-browser (minimum 4)
     {
       name: 'chromium',
       dependencies: ['setup'],

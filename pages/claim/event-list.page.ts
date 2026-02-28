@@ -25,4 +25,19 @@ export class EventListPage {
     async clickAddEvent() {
         await this.addBtn.click();
     }
+
+    async clickEditForEvent(eventName: string) {
+        const row = this.page.locator('.oxd-table-card').filter({ hasText: eventName });
+        await row.locator('.bi-pencil-fill').click();
+    }
+
+    async clickDeleteForEvent(eventName: string) {
+        const row = this.page.locator('.oxd-table-card').filter({ hasText: eventName });
+        await row.locator('.bi-trash').click();
+    }
+
+    // 🛡️ SENIOR FIX: The missing method that caused the TypeError
+    async confirmDelete() {
+        await this.page.getByRole('button', { name: 'Yes, Delete' }).click();
+    }
 }

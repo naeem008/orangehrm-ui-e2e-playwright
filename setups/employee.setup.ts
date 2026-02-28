@@ -20,17 +20,23 @@ export async function createEmployee(page: Page) {
     const employeeForm = new EmployeeFormPage(page);
 
     // 1. Generate 100% random First and Last names
-    const firstName = getRandomName(7); // Generates a random 7-letter name
-    const lastName = getRandomName(8); // Generates a random 8-letter name
+    const firstName = getRandomName(7);
+    const lastName = getRandomName(8);
     const employeeId = Date.now().toString().slice(-6);
 
     // 2. Execute Flow
     await navbar.goToPIM();
     await employeeList.clickAddEmployee();
+
+    // This method clicks 'Save' internally
     await employeeForm.fillEmployeeDetails(firstName, lastName, employeeId);
 
-    // 3. Validation
-    await expect(page).toHaveURL(/viewPersonalDetails/);
+    // 🛡️ SENIOR FIX (RACE CONDITION PREVENTED): 
+    // Force Playwright to wait for the backend to finish saving and show the success toast
+    await expect(page.locator('.oxd-toast-content--success')).toBeVisible({ timeout: 15000 });
+
+    // 3. Validation (Now it's safe to check the URL because the server has redirected)
+    await expect(page).toHaveURL(/viewPersonalDetails/, { timeout: 15000 });
 
     // 4. Return the random names so the 'Read' test can use them
     return { firstName, lastName, employeeId };
