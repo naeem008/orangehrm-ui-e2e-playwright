@@ -9,9 +9,15 @@ export default defineConfig({
   // Global test directory for actual specs
   testDir: './tests',
   fullyParallel: true,
-  // Capstone spec: Parallel execution
+  // Capstone spec: Parallel execution (Reduced to 1 locally to prevent XAMPP from crashing)
   workers: isCI ? 2 : 1,
   retries: isCI ? 1 : 0,
+
+  // 🛡️ MISSING SENIOR FIXES ADDED HERE (Global Timeouts for slow local server)
+  timeout: 60000, // Maximum time one test can run (increased to 60s)
+  expect: {
+    timeout: 15000, // Maximum time expect() should wait (increased from default 5s to 15s)
+  },
 
   // Capstone spec: Monocart HTML reporter
   reporter: [
@@ -27,7 +33,11 @@ export default defineConfig({
     viewport: { width: 1920, height: 1080 },
     // Capstone spec: Playwright trace on failure
     trace: 'retain-on-failure',
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
+
+    // 🛡️ MISSING SENIOR FIXES ADDED HERE (Action & Navigation Timeouts)
+    actionTimeout: 30000, // Maximum time each action such as `click()` can take
+    navigationTimeout: 30000, // Maximum time for page.goto() or page load
   },
 
   // Capstone spec: Local Server Automation (Paths updated to match clean architecture)
