@@ -2,67 +2,92 @@ name: OrangeHRM E2E CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   test:
+    name: Playwright UI E2E Tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Start OrangeHRM Docker Container
-      run: docker compose -f docker-compose.orangehrm.yml up -d
+      - name: Start OrangeHRM Docker Container
+        run: docker compose -f docker-compose.orangehrm.yml up -d
 
-    - name: Wait for Server Readiness
-      run: |
-        echo "Waiting for OrangeHRM container to fully boot up..."
-        # Increased loop to 60 (5 minutes) to allow massive DB seeding
-        for i in {1..60}; do
-          STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/web/index.php/auth/login || echo "000")
-          
-          if [ "$STATUS" = "200" ]; then
-            echo "OrangeHRM is UP and responding with 200 OK."
-            exit 0
-          fi
-          
-          echo "Status: $STATUS. Container still booting/extracting DB. Waiting 5s... ($i/60)"
-          sleep 5
-        done
-        
-        echo "FATAL: OrangeHRM failed to boot within 5 minutes. Fetching Docker logs:"
-        docker compose -f docker-compose.orangehrm.yml logs
-        exit 1
+      - name: Wait for OrangeHRM Readiness
+        run: |
+          echo "Waiting for OrangeHRM to become ready..."
+          for i in {1..60}; do
+            STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/web/index.php/auth/login || echo "000")
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
+            if [ "$STATUS" = "200" ]; then
+              echo "OrangeHRM is ready and responding with 200 OK."
+              exit 0
+            fi
 
-    - name: Install Dependencies
-      run: npm ci
+            echo "Current status: $STATUS. Waiting 5 seconds... ($i/60)"
+            sleep 5
+          done
 
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+          echo "OrangeHRM failed to start within expected time."
+          echo "Docker container status:"
+          docker ps -a
+          echo "Docker logs:"
+          docker compose -f docker-compose.orangehrm.yml logs
+          exit 1
 
-    - name: Run ESLint
-      run: npm run lint
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+          run_install: false
 
-    - name: Run Playwright Tests
-      run: npx playwright test
-      env:
-        BASE_URL: http://localhost:8080
-        ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-        ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
-    - name: Upload Report Artifacts
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: monocart-report
-        path: playwright-report/
-        retention-days: 14
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run Format Check
+        run: pnpm run format:check
+
+      - name: Run ESLint
+        run: pnpm run lint
+
+      - name: Run Playwright Tests
+        run: pnpm test
+        env:
+          BASE_URL: http://localhost:8080
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+      - name: Upload Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orangehrm-playwright-artifacts
+          path: |
+            playwright-report/
+            test-results/
+            reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Show Docker Logs on Failure
+        if: failure()
+        run: docker compose -f docker-compose.orangehrm.yml logs
+
+      - name: Stop OrangeHRM Docker Container
+        if: always()
+        run: docker compose -f docker-compose.orangehrm.yml down -v

@@ -31,7 +31,7 @@ export async function createEmployee(page: Page) {
     // This method clicks 'Save' internally
     await employeeForm.fillEmployeeDetails(firstName, lastName, employeeId);
 
-    // 🛡️ SENIOR FIX (RACE CONDITION PREVENTED): 
+    // 🛡️ SENIOR FIX (RACE CONDITION PREVENTED):
     // Force Playwright to wait for the backend to finish saving and show the success toast
     await expect(page.locator('.oxd-toast-content--success')).toBeVisible({ timeout: 15000 });
 

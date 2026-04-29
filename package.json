@@ -1,17 +1,26 @@
 {
+  "name": "orangehrm-ui-e2e-playwright",
+  "version": "1.0.0",
+  "description": "OrangeHRM UI E2E automation using Playwright and TypeScript",
+  "type": "module",
+  "private": true,
   "scripts": {
-    "test": "npx playwright test",
-    "test:ui": "npx playwright test --ui",
-    "report": "npx playwright show-report",
-    "format": "prettier --write \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\"",
-    "lint": "eslint \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" --fix"
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report playwright-report",
+    "lint": "eslint \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\"",
+    "lint:fix": "eslint \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\" --fix",
+    "format": "prettier --write \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\"",
+    "format:check": "prettier --check \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\"",
+    "ci": "pnpm run format:check && pnpm run lint && pnpm test"
   },
   "dependencies": {
-    "@playwright/test": "^1.58.2",
     "dotenv": "^17.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.2",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
@@ -21,6 +30,8 @@
     "eslint-plugin-prettier": "^5.5.5",
     "monocart-reporter": "^2.10.0",
     "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
-  }
+  },
+  "packageManager": "pnpm@10.24.0"
 }

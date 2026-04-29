@@ -6,83 +6,86 @@ dotenv.config();
 const isCI = !!process.env.CI;
 
 export default defineConfig({
-  // Global test directory for actual specs
-  testDir: './tests',
-  fullyParallel: true,
-  // Capstone spec: Parallel execution (Reduced to 1 locally to prevent XAMPP from crashing)
-  workers: isCI ? 2 : 1,
-  retries: isCI ? 1 : 0,
+    // Global test directory for actual specs
+    testDir: './tests',
+    fullyParallel: true,
+    // Capstone spec: Parallel execution (Reduced to 1 locally to prevent XAMPP from crashing)
+    workers: isCI ? 2 : 1,
+    retries: isCI ? 1 : 0,
 
-  // 🛡️ MISSING SENIOR FIXES ADDED HERE (Global Timeouts for slow local server)
-  timeout: 60000, // Maximum time one test can run (increased to 60s)
-  expect: {
-    timeout: 15000, // Maximum time expect() should wait (increased from default 5s to 15s)
-  },
-
-  // Capstone spec: Monocart HTML reporter
-  reporter: [
-    ['list'],
-    ['monocart-reporter', {
-      name: 'OrangeHRM E2E Automation Report',
-      outputFile: './playwright-report/index.html'
-    }]
-  ],
-
-  use: {
-    baseURL: process.env.BASE_URL,
-    viewport: { width: 1920, height: 1080 },
-    // Capstone spec: Playwright trace on failure
-    trace: 'retain-on-failure',
-    video: 'retain-on-failure',
-
-    // 🛡️ MISSING SENIOR FIXES ADDED HERE (Action & Navigation Timeouts)
-    actionTimeout: 30000, // Maximum time each action such as `click()` can take
-    navigationTimeout: 30000, // Maximum time for page.goto() or page load
-  },
-
-  // Capstone spec: Local Server Automation (Paths updated to match clean architecture)
-  globalSetup: require.resolve('./scripts/global-setup.ts'),
-  globalTeardown: require.resolve('./scripts/global-teardown.ts'),
-
-  projects: [
-    {
-      name: 'setup',
-      testDir: './setups',
-      testMatch: 'auth.setup.ts' // 🛡️ CRITICAL FIX: Only auth setup is treated as a test file
+    // 🛡️ MISSING SENIOR FIXES ADDED HERE (Global Timeouts for slow local server)
+    timeout: 60000, // Maximum time one test can run (increased to 60s)
+    expect: {
+        timeout: 15000, // Maximum time expect() should wait (increased from default 5s to 15s)
     },
-    // Capstone spec: Multi-browser (minimum 4)
-    {
-      name: 'chromium',
-      dependencies: ['setup'],
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/admin.json'
-      },
+
+    // Capstone spec: Monocart HTML reporter
+    reporter: [
+        ['list'],
+        [
+            'monocart-reporter',
+            {
+                name: 'OrangeHRM E2E Automation Report',
+                outputFile: './playwright-report/index.html',
+            },
+        ],
+    ],
+
+    use: {
+        baseURL: process.env.BASE_URL,
+        viewport: { width: 1920, height: 1080 },
+        // Capstone spec: Playwright trace on failure
+        trace: 'retain-on-failure',
+        video: 'retain-on-failure',
+
+        // 🛡️ MISSING SENIOR FIXES ADDED HERE (Action & Navigation Timeouts)
+        actionTimeout: 30000, // Maximum time each action such as `click()` can take
+        navigationTimeout: 30000, // Maximum time for page.goto() or page load
     },
-    {
-      name: 'firefox',
-      dependencies: ['setup'],
-      use: {
-        ...devices['Desktop Firefox'],
-        storageState: 'playwright/.auth/admin.json'
-      },
-    },
-    {
-      name: 'webkit',
-      dependencies: ['setup'],
-      use: {
-        ...devices['Desktop Safari'],
-        storageState: 'playwright/.auth/admin.json'
-      },
-    },
-    {
-      name: 'edge',
-      dependencies: ['setup'],
-      use: {
-        ...devices['Desktop Edge'],
-        channel: 'msedge',
-        storageState: 'playwright/.auth/admin.json'
-      },
-    },
-  ],
+
+    // Capstone spec: Local Server Automation (Paths updated to match clean architecture)
+    globalSetup: require.resolve('./scripts/global-setup.ts'),
+    globalTeardown: require.resolve('./scripts/global-teardown.ts'),
+
+    projects: [
+        {
+            name: 'setup',
+            testDir: './setups',
+            testMatch: 'auth.setup.ts', // 🛡️ CRITICAL FIX: Only auth setup is treated as a test file
+        },
+        // Capstone spec: Multi-browser (minimum 4)
+        {
+            name: 'chromium',
+            dependencies: ['setup'],
+            use: {
+                ...devices['Desktop Chrome'],
+                storageState: 'playwright/.auth/admin.json',
+            },
+        },
+        {
+            name: 'firefox',
+            dependencies: ['setup'],
+            use: {
+                ...devices['Desktop Firefox'],
+                storageState: 'playwright/.auth/admin.json',
+            },
+        },
+        {
+            name: 'webkit',
+            dependencies: ['setup'],
+            use: {
+                ...devices['Desktop Safari'],
+                storageState: 'playwright/.auth/admin.json',
+            },
+        },
+        {
+            name: 'edge',
+            dependencies: ['setup'],
+            use: {
+                ...devices['Desktop Edge'],
+                channel: 'msedge',
+                storageState: 'playwright/.auth/admin.json',
+            },
+        },
+    ],
 });
