@@ -12,33 +12,42 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
+    env:
+      BASE_URL: http://localhost:8080
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      SERVER_MODE: docker
+      WAIT_TIMEOUT_MS: 180000
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Start OrangeHRM Docker Container
-        run: docker compose -f docker-compose.orangehrm.yml up -d
+      - name: Start OrangeHRM Docker
+        run: docker compose -f docker-compose.orangehrm.yml up -d --force-recreate
 
       - name: Wait for OrangeHRM Readiness
         run: |
-          echo "Waiting for OrangeHRM to become ready..."
-          for i in {1..60}; do
-            STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/web/index.php/auth/login || echo "000")
+          echo "Waiting for OrangeHRM login page..."
+          for i in {1..90}; do
+            STATUS=$(curl -L --max-time 10 -s -o /dev/null -w "%{http_code}" http://localhost:8080/web/index.php/auth/login || echo "000")
 
             if [ "$STATUS" = "200" ]; then
-              echo "OrangeHRM is ready and responding with 200 OK."
+              echo "OrangeHRM is ready."
               exit 0
             fi
 
-            echo "Current status: $STATUS. Waiting 5 seconds... ($i/60)"
+            echo "Status: $STATUS. Waiting 5 seconds... ($i/90)"
             sleep 5
           done
 
-          echo "OrangeHRM failed to start within expected time."
-          echo "Docker container status:"
-          docker ps -a
-          echo "Docker logs:"
-          docker compose -f docker-compose.orangehrm.yml logs
+          echo "OrangeHRM did not become ready."
+          echo "Docker containers:"
+          docker compose -f docker-compose.orangehrm.yml ps
+          echo "OrangeHRM logs:"
+          docker compose -f docker-compose.orangehrm.yml logs orangehrm --tail=200
+          echo "DB logs:"
+          docker compose -f docker-compose.orangehrm.yml logs db --tail=200
           exit 1
 
       - name: Setup pnpm
@@ -67,10 +76,6 @@ jobs:
 
       - name: Run Playwright Tests
         run: pnpm test
-        env:
-          BASE_URL: http://localhost:8080
-          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
 
       - name: Upload Test Artifacts
         if: always()
@@ -86,8 +91,11 @@ jobs:
 
       - name: Show Docker Logs on Failure
         if: failure()
-        run: docker compose -f docker-compose.orangehrm.yml logs
+        run: |
+          docker compose -f docker-compose.orangehrm.yml ps
+          docker compose -f docker-compose.orangehrm.yml logs orangehrm --tail=200
+          docker compose -f docker-compose.orangehrm.yml logs db --tail=200
 
-      - name: Stop OrangeHRM Docker Container
+      - name: Stop OrangeHRM Docker
         if: always()
-        run: docker compose -f docker-compose.orangehrm.yml down -v
+        run: docker compose -f docker-compose.orangehrm.yml down -v --remove-orphans

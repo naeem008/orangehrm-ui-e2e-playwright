@@ -44,8 +44,8 @@ export default defineConfig({
     },
 
     // Capstone spec: Local Server Automation (Paths updated to match clean architecture)
-    globalSetup: require.resolve('./scripts/global-setup.ts'),
-    globalTeardown: require.resolve('./scripts/global-teardown.ts'),
+    globalSetup: './scripts/global-setup.ts',
+    globalTeardown: './scripts/global-teardown.ts',
 
     projects: [
         {

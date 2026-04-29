@@ -3,86 +3,106 @@ import fs from 'node:fs';
 import http from 'node:http';
 import https from 'node:https';
 import path from 'node:path';
+import dotenv from 'dotenv';
 
-function runXampp(exeName: string, xamppDir: string) {
-    const exePath = path.join(xamppDir, exeName);
+dotenv.config();
+
+const BASE_URL = process.env.BASE_URL ?? 'http://localhost:8080';
+const XAMPP_DIR = process.env.XAMPP_DIR ?? 'C:\\xampp';
+const TIMEOUT_MS = Number(process.env.WAIT_TIMEOUT_MS ?? 180000);
+const SERVER_MODE = process.env.SERVER_MODE ?? 'docker';
+
+function buildLoginUrl(baseUrl: string): string {
+    const cleanBaseUrl = baseUrl.replace(/\/$/, '');
+    return `${cleanBaseUrl}/web/index.php/auth/login`;
+}
+
+function runXampp(exeName: string): void {
+    const exePath = path.join(XAMPP_DIR, exeName);
+
     if (!fs.existsSync(exePath)) {
-        throw new Error(`XAMPP executable not found: ${exePath}`);
+        throw new Error(
+            `XAMPP executable not found: ${exePath}\n` + 'Set XAMPP_DIR env var if your install path is different.'
+        );
     }
 
-    console.log(`\n[SETUP] Starting XAMPP via: ${exePath}`);
-    const res = spawnSync(exePath, { cwd: xamppDir, stdio: 'inherit' });
+    console.log(`[SETUP] Starting XAMPP via: ${exePath}`);
+    const result = spawnSync(exePath, { cwd: XAMPP_DIR, stdio: 'inherit' });
 
-    if (typeof res.status === 'number' && res.status !== 0) {
-        throw new Error(`Failed to run ${exeName}. Exit code: ${res.status}`);
+    if (typeof result.status === 'number' && result.status !== 0) {
+        throw new Error(`Failed to run ${exeName}. Exit code: ${result.status}`);
     }
 }
 
-function pingOnce(urlStr: string): Promise<boolean> {
+function pingOnce(urlString: string): Promise<boolean> {
     return new Promise((resolve) => {
-        const u = new URL(urlStr);
-        const lib = u.protocol === 'https:' ? https : http;
+        const url = new URL(urlString);
+        const client = url.protocol === 'https:' ? https : http;
 
-        const req = lib.request(
+        const request = client.request(
             {
                 method: 'GET',
-                hostname: u.hostname,
-                port: u.port ? Number(u.port) : u.protocol === 'https:' ? 443 : 80,
-                path: u.pathname + (u.search ?? ''),
+                hostname: url.hostname,
+                port: url.port ? Number(url.port) : url.protocol === 'https:' ? 443 : 80,
+                path: `${url.pathname}${url.search}`,
                 timeout: 5000,
             },
-            (res) => {
-                const ok = (res.statusCode ?? 0) >= 200 && (res.statusCode ?? 0) < 400;
-                res.resume();
-                resolve(ok);
+            (response) => {
+                const statusCode = response.statusCode ?? 0;
+                response.resume();
+                resolve(statusCode >= 200 && statusCode < 400);
             }
         );
 
-        req.on('timeout', () => {
-            req.destroy();
+        request.on('timeout', () => {
+            request.destroy();
             resolve(false);
         });
-        req.on('error', () => resolve(false));
-        req.end();
+
+        request.on('error', () => resolve(false));
+        request.end();
     });
 }
 
-async function waitForUrl(url: string, timeoutMs: number) {
+async function waitForUrl(url: string, timeoutMs: number): Promise<void> {
     const start = Date.now();
-    process.stdout.write(`[SETUP] Waiting for ${url} `);
+
+    process.stdout.write(`[SETUP] Waiting for ${url}`);
 
     while (Date.now() - start < timeoutMs) {
-        const ok = await pingOnce(url);
-        if (ok) {
-            process.stdout.write(' [READY]\n');
+        const isReady = await pingOnce(url);
+
+        if (isReady) {
+            process.stdout.write('  [READY]\n');
             return;
         }
+
         process.stdout.write('.');
-        await new Promise((r) => setTimeout(r, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+
     process.stdout.write('\n');
     throw new Error(`Timed out after ${timeoutMs}ms waiting for ${url}`);
 }
 
-async function globalSetup() {
-    if (process.platform !== 'win32') {
-        console.warn('[WARNING] This script targets Windows XAMPP. Skipping auto-start.');
+export default async function globalSetup(): Promise<void> {
+    const loginUrl = buildLoginUrl(BASE_URL);
+
+    if (SERVER_MODE === 'docker' || process.env.CI === 'true') {
+        console.log('[SETUP] Docker/CI mode detected. Skipping XAMPP start.');
+        await waitForUrl(loginUrl, TIMEOUT_MS);
+        console.log('[SETUP] Environment is ready. Starting tests...');
         return;
     }
 
-    // Default to your path if .env is missing [cite: 5, 6]
-    const XAMPP_DIR = process.env.XAMPP_DIR ?? 'C:\\xampp';
-    const BASE_URL = process.env.BASE_URL ?? 'http://localhost/orangehrm-5.8';
-    const TIMEOUT_MS = Number(process.env.WAIT_TIMEOUT_MS ?? 60000);
-
-    try {
-        runXampp('xampp_start.exe', XAMPP_DIR);
-        await waitForUrl(BASE_URL, TIMEOUT_MS);
-        console.log(`[SETUP] Environment is ready. Starting tests...`);
-    } catch (err: any) {
-        console.error(`\n[ERROR] ${err?.message ?? err}`);
-        process.exit(1);
+    if (process.platform !== 'win32') {
+        console.log('[SETUP] Non-Windows environment detected. Skipping XAMPP start.');
+        await waitForUrl(loginUrl, TIMEOUT_MS);
+        console.log('[SETUP] Environment is ready. Starting tests...');
+        return;
     }
-}
 
-export default globalSetup;
+    runXampp('xampp_start.exe');
+    await waitForUrl(loginUrl, TIMEOUT_MS);
+    console.log('[SETUP] Environment is ready. Starting tests...');
+}

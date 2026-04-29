@@ -1,35 +1,36 @@
-version: '3.8'
-
 services:
   db:
-    image: mariadb:10.6
+    image: mariadb:10.4.30
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ohrm
-      MYSQL_USER: ohrm
-      MYSQL_PASSWORD: ohrm
-    ports:
-      - "3306:3306"
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: ohrm
+      MARIADB_USER: ohrm
+      MARIADB_PASSWORD: ohrm
     volumes:
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - orangehrm_db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 30
 
   orangehrm:
-    image: orangehrm/orangehrm:latest
+    image: orangehrm/orangehrm:5.8
     depends_on:
       db:
         condition: service_healthy
     environment:
-      # 🛡️ THE FIX: Using the strictly required Official Docker variables for OrangeHRM
       ORANGEHRM_DATABASE_HOST: db
       ORANGEHRM_DATABASE_PORT: 3306
       ORANGEHRM_DATABASE_NAME: ohrm
       ORANGEHRM_DATABASE_USER: ohrm
       ORANGEHRM_DATABASE_PASSWORD: ohrm
+    volumes:
+      - ./docker/orangehrm/Conf.php:/var/www/html/lib/confs/Conf.php:ro
     ports:
       - "8080:80"
     restart: on-failure
+
+volumes:
+  orangehrm_db_data:
