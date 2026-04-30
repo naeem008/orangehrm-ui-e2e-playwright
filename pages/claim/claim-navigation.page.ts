@@ -15,23 +15,29 @@ export class ClaimNavigationPage {
         this.submitClaimLink = page.getByRole('link', { name: 'Submit Claim' });
         this.myClaimsLink = page.getByRole('link', { name: 'My Claims' });
 
-        this.submitClaimHeading = page.getByRole('heading', { name: /^Submit Claim$/i });
-        this.myClaimsHeading = page.getByRole('heading', { name: /^My Claims$/i });
+        this.submitClaimHeading = page.getByRole('heading', {
+            name: /^Create Claim Request$/i,
+        });
+
+        this.myClaimsHeading = page.getByRole('heading', {
+            name: /^My Claims$/i,
+        });
     }
 
     async navigateToSubmitClaim() {
-        await expect(this.claimMenu).toBeVisible({ timeout: 30000 });
-        await this.claimMenu.click();
-
-        await expect(this.submitClaimLink).toBeVisible({ timeout: 30000 });
-        await this.submitClaimLink.click();
+        await this.page.goto(`${process.env.BASE_URL}/web/index.php/claim/submitClaim`, {
+            waitUntil: 'domcontentloaded',
+        });
 
         await expect(this.submitClaimHeading).toBeVisible({ timeout: 30000 });
     }
 
     async navigateToMyClaims() {
-        await expect(this.claimMenu).toBeVisible({ timeout: 30000 });
-        await this.claimMenu.click();
+        // Do not use /claim/viewMyClaims directly.
+        // OrangeHRM local route can reject it. Open Claim module, then click the My Claims tab.
+        await this.page.goto(`${process.env.BASE_URL}/web/index.php/claim/viewClaimModule`, {
+            waitUntil: 'domcontentloaded',
+        });
 
         await expect(this.myClaimsLink).toBeVisible({ timeout: 30000 });
         await this.myClaimsLink.click();

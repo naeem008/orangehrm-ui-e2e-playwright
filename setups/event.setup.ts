@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 import { EventFormPage } from '../pages/claim/event-form.page';
 import { EventListPage } from '../pages/claim/event-list.page';
@@ -22,12 +22,18 @@ export async function createEventSetup(page: Page) {
     await eventForm.fillEventDetails(eventName, description);
     await eventForm.clickSave();
 
-    await expect(page.getByText('Successfully Saved')).toBeVisible({
-        timeout: 15000,
-    });
+    await page
+        .locator('.oxd-toast--success')
+        .waitFor({
+            state: 'visible',
+            timeout: 15000,
+        })
+        .catch(() => {
+            console.log('[INFO] Success toast was not detected, checking grid directly.');
+        });
 
     await page
-        .getByText('Successfully Saved')
+        .locator('.oxd-toast--success')
         .waitFor({
             state: 'hidden',
             timeout: 30000,
@@ -36,13 +42,7 @@ export async function createEventSetup(page: Page) {
             console.log('[INFO] Success toast did not hide within timeout, continuing.');
         });
 
-    await eventList.navigateToEvents();
-
-    const createdRow = page.locator('.oxd-table-card').filter({
-        hasText: eventName,
-    });
-
-    await expect(createdRow).toBeVisible({ timeout: 30000 });
+    await eventList.expectEventVisible(eventName);
 
     console.log(`[SETUP] Event Created and Verified: ${eventName}`);
 

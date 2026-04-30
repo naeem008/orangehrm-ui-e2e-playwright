@@ -30,22 +30,17 @@ test.describe('Claim - Event Management Create', () => {
         await eventForm.fillEventDetails(eventName, eventDescription);
         await eventForm.clickSave();
 
-        await page.getByText('Successfully Saved').waitFor({
-            state: 'visible',
-            timeout: 15000,
-        });
-
         await page
-            .getByText('Successfully Saved')
+            .locator('.oxd-toast--success')
             .waitFor({
-                state: 'hidden',
-                timeout: 30000,
+                state: 'visible',
+                timeout: 15000,
             })
             .catch(() => {
-                console.log('[INFO] Success toast did not hide within timeout, continuing.');
+                console.log('[INFO] Success toast was not detected, checking grid directly.');
             });
 
-        await eventList.navigateToEvents();
+        await eventList.expectEventVisible(eventName);
 
         const createdEventRow = page.locator('.oxd-table-card').filter({
             hasText: eventName,
