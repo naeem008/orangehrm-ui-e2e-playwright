@@ -9,17 +9,17 @@ export default defineConfig({
     // Global test directory for actual specs
     testDir: './tests',
     fullyParallel: true,
-    // Capstone spec: Parallel execution (Reduced to 1 locally to prevent XAMPP from crashing)
+
     workers: isCI ? 2 : 1,
     retries: isCI ? 1 : 0,
 
-    // 🛡️ MISSING SENIOR FIXES ADDED HERE (Global Timeouts for slow local server)
-    timeout: 60000, // Maximum time one test can run (increased to 60s)
+
+    timeout: 60000,
     expect: {
         timeout: 15000, // Maximum time expect() should wait (increased from default 5s to 15s)
     },
 
-    // Capstone spec: Monocart HTML reporter
+    // Monocart HTML reporter
     reporter: [
         ['list'],
         [
@@ -38,12 +38,12 @@ export default defineConfig({
         trace: 'retain-on-failure',
         video: 'retain-on-failure',
 
-        // 🛡️ MISSING SENIOR FIXES ADDED HERE (Action & Navigation Timeouts)
-        actionTimeout: 30000, // Maximum time each action such as `click()` can take
-        navigationTimeout: 30000, // Maximum time for page.goto() or page load
+
+        actionTimeout: 30000,
+        navigationTimeout: 30000,
     },
 
-    // Capstone spec: Local Server Automation (Paths updated to match clean architecture)
+
     globalSetup: './scripts/global-setup.ts',
     globalTeardown: './scripts/global-teardown.ts',
 
@@ -51,9 +51,9 @@ export default defineConfig({
         {
             name: 'setup',
             testDir: './setups',
-            testMatch: 'auth.setup.ts', // 🛡️ CRITICAL FIX: Only auth setup is treated as a test file
+            testMatch: 'auth.setup.ts',
         },
-        // Capstone spec: Multi-browser (minimum 4)
+
         {
             name: 'chromium',
             dependencies: ['setup'],
