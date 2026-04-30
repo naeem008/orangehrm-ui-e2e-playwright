@@ -17,9 +17,7 @@ test.describe('Claim - Event Management Update', () => {
 
         const eventData = await createEventSetup(page);
 
-        const updatedEventName = `UpdatedEvent_${Date.now()}_${Math.random()
-            .toString(36)
-            .slice(2, 7)}`;
+        const updatedEventName = `UpdatedEvent_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
         console.log('------------------------------------------------');
         console.log(`[SETUP] Base Event Created: ${eventData.eventName}`);

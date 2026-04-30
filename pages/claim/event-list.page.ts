@@ -25,10 +25,7 @@ export class EventListPage {
 
         await expect(this.eventsMenu).toBeVisible({ timeout: 30000 });
 
-        await Promise.all([
-            this.page.waitForURL(/.*\/claim\/events.*/, { timeout: 30000 }),
-            this.eventsMenu.click(),
-        ]);
+        await Promise.all([this.page.waitForURL(/.*\/claim\/events.*/, { timeout: 30000 }), this.eventsMenu.click()]);
 
         await expect(this.addBtn).toBeVisible({ timeout: 30000 });
     }

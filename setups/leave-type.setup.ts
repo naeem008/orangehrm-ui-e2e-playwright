@@ -10,9 +10,7 @@ export async function createLeaveType(page: Page) {
     await leaveTypeList.navigateToLeaveTypes();
     await leaveTypeList.clickAddLeaveType();
 
-    const uniqueLeaveName = `SickLeave_${Date.now()}_${Math.random()
-        .toString(36)
-        .slice(2, 7)}`;
+    const uniqueLeaveName = `SickLeave_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
     console.log(`[SETUP] Generating new Leave Type: ${uniqueLeaveName}`);
 
