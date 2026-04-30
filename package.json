@@ -4,16 +4,34 @@
   "description": "OrangeHRM UI E2E automation using Playwright and TypeScript",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
+    "clean": "node -e \"const fs=require('fs'); ['playwright-report','test-results','reports','blob-report'].forEach(p=>fs.rmSync(p,{recursive:true,force:true}))\"",
+    "install:browsers": "playwright install --with-deps",
     "test": "playwright test",
+    "test:ci": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:edge": "playwright test --project=edge",
+    "test:leave-read": "playwright test tests/ui/leave/leave-type.read.spec.ts",
+    "test:leave-read:chromium": "playwright test tests/ui/leave/leave-type.read.spec.ts --project=chromium --reporter=list",
+    "test:claim": "playwright test tests/ui/Claim",
+    "test:employee": "playwright test tests/ui/employee",
+    "test:leave": "playwright test tests/ui/leave",
+    "test:event": "playwright test tests/ui/event",
     "report": "playwright show-report playwright-report",
+    "report:html": "playwright show-report playwright-report",
+    "report:monocart": "npx http-server reports/monocart -o",
     "lint": "eslint \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\"",
     "lint:fix": "eslint \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\" --fix",
     "format": "prettier --write \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\"",
     "format:check": "prettier --check \"tests/**/*.ts\" \"pages/**/*.ts\" \"setups/**/*.ts\" \"utils/**/*.ts\" \"scripts/**/*.ts\" \"playwright.config.ts\"",
-    "ci": "pnpm run format:check && pnpm run lint && pnpm test"
+    "verify": "pnpm run format:check && pnpm run lint",
+    "ci": "pnpm run verify && pnpm run test:ci"
   },
   "dependencies": {
     "dotenv": "^17.3.1"
@@ -21,17 +39,17 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
-    "@types/node": "^25.3.2",
+    "@types/node": "^20.19.39",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-playwright": "^2.7.1",
     "eslint-plugin-prettier": "^5.5.5",
+    "http-server": "^14.1.1",
     "monocart-reporter": "^2.10.0",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
-  },
-  "packageManager": "pnpm@10.24.0"
+  }
 }

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+
 import { LeaveTypeListPage } from '../../../pages/leave/leave-type-list.page';
 
 test.describe('Leave - Leave Type Read', () => {
@@ -7,7 +8,9 @@ test.describe('Leave - Leave Type Read', () => {
             waitUntil: 'domcontentloaded',
         });
 
-        await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible({
+            timeout: 15000,
+        });
     });
 
     test('Should successfully navigate to Leave Type list and verify table structure', async ({ page }) => {
@@ -18,21 +21,13 @@ test.describe('Leave - Leave Type Read', () => {
 
         await leaveTypeList.navigateToLeaveTypes();
 
-        await expect(page).toHaveURL(/.*leave.*leaveTypeList.*/, {
-            timeout: 15000,
-        });
+        await expect(page).toHaveURL(/.*leave.*leaveTypeList.*/);
 
-        await expect(page.getByRole('heading', { name: /^Leave Types$/i })).toBeVisible({ timeout: 15000 });
+        await expect(leaveTypeList.pageHeading).toBeVisible();
+        await expect(leaveTypeList.tableHeader).toBeVisible();
 
-        const tableHeader = page.locator('.oxd-table-header');
-
-        await expect(tableHeader).toBeVisible({ timeout: 15000 });
-        await expect(tableHeader.getByText(/^Name$/i)).toBeVisible({
-            timeout: 10000,
-        });
-        await expect(tableHeader.getByText(/^Actions$/i)).toBeVisible({
-            timeout: 10000,
-        });
+        await expect(leaveTypeList.tableHeader.getByText(/^Name$/i)).toBeVisible();
+        await expect(leaveTypeList.tableHeader.getByText(/^Actions$/i)).toBeVisible();
 
         console.log('[SUCCESS] Leave Type list page is fully loaded and readable!');
         console.log('------------------------------------------------');
