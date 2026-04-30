@@ -13,8 +13,8 @@ export class EventListPage {
 
         this.claimMenu = page.locator('a.oxd-main-menu-item[href*="/claim/viewClaimModule"]');
         this.configurationMenu = page.locator('nav.oxd-topbar-body-nav').getByText('Configuration');
-        this.eventsMenu = page.getByRole('menuitem', { name: 'Events' });
 
+        this.eventsMenu = page.getByRole('menuitem', { name: 'Events' });
         this.addBtn = page.getByRole('button', { name: 'Add' });
         this.pageHeading = page.getByRole('heading', { name: /^Events$/i });
     }
@@ -45,7 +45,10 @@ export class EventListPage {
         });
 
         await expect(row).toBeVisible({ timeout: 30000 });
-        await row.locator('.bi-pencil-fill').click();
+
+        const editButton = row.locator('.bi-pencil-fill');
+        await expect(editButton).toBeVisible({ timeout: 15000 });
+        await editButton.click();
     }
 
     async clickDeleteForEvent(eventName: string) {
@@ -54,7 +57,10 @@ export class EventListPage {
         });
 
         await expect(row).toBeVisible({ timeout: 30000 });
-        await row.locator('.bi-trash').click();
+
+        const deleteButton = row.locator('.bi-trash');
+        await expect(deleteButton).toBeVisible({ timeout: 15000 });
+        await deleteButton.click();
     }
 
     async confirmDelete() {
@@ -70,5 +76,13 @@ export class EventListPage {
         });
 
         await expect(row).toBeVisible({ timeout: 30000 });
+    }
+
+    async expectEventNotVisible(eventName: string) {
+        const row = this.page.locator('.oxd-table-card').filter({
+            hasText: eventName,
+        });
+
+        await expect(row).toHaveCount(0, { timeout: 30000 });
     }
 }

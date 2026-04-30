@@ -1,13 +1,17 @@
-import { expect, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 import { LeaveTypeFormPage } from '../pages/leave/leave-type-form.page';
 import { LeaveTypeListPage } from '../pages/leave/leave-type-list.page';
+
+function generateUniqueLeaveName(): string {
+    return `SickLeave_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
 
 export async function createLeaveType(page: Page) {
     const leaveTypeList = new LeaveTypeListPage(page);
     const leaveTypeForm = new LeaveTypeFormPage(page);
 
-    const uniqueLeaveName = `SickLeave_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const uniqueLeaveName = generateUniqueLeaveName();
 
     console.log(`[SETUP] Creating Leave Type: ${uniqueLeaveName}`);
 
@@ -17,15 +21,20 @@ export async function createLeaveType(page: Page) {
     await leaveTypeForm.fillLeaveTypeName(uniqueLeaveName);
     await leaveTypeForm.clickSave();
 
-    await expect(page.getByText('Successfully Saved')).toBeVisible({
+    await page.getByText('Successfully Saved').waitFor({
+        state: 'visible',
         timeout: 15000,
     });
 
-    await expect(page.getByText('Successfully Saved'))
-        .toBeHidden({
+    await page
+        .getByText('Successfully Saved')
+        .waitFor({
+            state: 'hidden',
             timeout: 30000,
         })
-        .catch(() => {});
+        .catch(() => {
+            console.log('[INFO] Success toast did not hide within timeout, continuing.');
+        });
 
     await leaveTypeList.navigateToLeaveTypes();
 
@@ -33,9 +42,12 @@ export async function createLeaveType(page: Page) {
         hasText: uniqueLeaveName,
     });
 
-    await expect(createdRow).toBeVisible({ timeout: 30000 });
+    await createdRow.waitFor({
+        state: 'visible',
+        timeout: 30000,
+    });
 
-    console.log(`[SETUP] Leave Type Created: ${uniqueLeaveName}`);
+    console.log(`[SETUP] Leave Type Created and Verified: ${uniqueLeaveName}`);
 
     return {
         leaveName: uniqueLeaveName,

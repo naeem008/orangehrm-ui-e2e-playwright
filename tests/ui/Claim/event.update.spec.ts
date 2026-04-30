@@ -38,15 +38,20 @@ test.describe('Claim - Event Management Update', () => {
 
         await eventForm.clickSave();
 
-        await expect(page.getByText('Successfully Updated')).toBeVisible({
+        await page.getByText('Successfully Updated').waitFor({
+            state: 'visible',
             timeout: 15000,
         });
 
-        await expect(page.getByText('Successfully Updated'))
-            .toBeHidden({
+        await page
+            .getByText('Successfully Updated')
+            .waitFor({
+                state: 'hidden',
                 timeout: 30000,
             })
-            .catch(() => {});
+            .catch(() => {
+                console.log('[INFO] Update toast did not hide within timeout, continuing.');
+            });
 
         await eventList.navigateToEvents();
         await eventList.expectEventVisible(updatedEventName);

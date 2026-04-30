@@ -26,14 +26,23 @@ export async function createEventSetup(page: Page) {
         timeout: 15000,
     });
 
-    await expect(page.getByText('Successfully Saved'))
-        .toBeHidden({
+    await page
+        .getByText('Successfully Saved')
+        .waitFor({
+            state: 'hidden',
             timeout: 30000,
         })
-        .catch(() => {});
+        .catch(() => {
+            console.log('[INFO] Success toast did not hide within timeout, continuing.');
+        });
 
     await eventList.navigateToEvents();
-    await eventList.expectEventVisible(eventName);
+
+    const createdRow = page.locator('.oxd-table-card').filter({
+        hasText: eventName,
+    });
+
+    await expect(createdRow).toBeVisible({ timeout: 30000 });
 
     console.log(`[SETUP] Event Created and Verified: ${eventName}`);
 
