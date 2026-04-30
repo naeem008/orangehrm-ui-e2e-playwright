@@ -19,11 +19,8 @@ export class ClaimFormPage {
         this.remarksTextarea = page.locator('textarea');
 
         this.createButton = page.getByRole('button', { name: 'Create' });
-
-        // Keep both names because existing tests use finalSubmitButton.
         this.submitButton = page.getByRole('button', { name: 'Submit' });
         this.finalSubmitButton = this.submitButton;
-
         this.backButton = page.getByRole('button', { name: 'Back' });
     }
 
@@ -63,8 +60,6 @@ export class ClaimFormPage {
     async clickBack() {
         await expect(this.backButton).toBeVisible({ timeout: 15000 });
         await this.backButton.click();
-
-        console.log('[ACTION] Clicked Back button to return to My Claims.');
     }
 
     async addExpense(type: string, date: string, amount: string) {
@@ -98,7 +93,7 @@ export class ClaimFormPage {
         await expect(saveButton).toBeVisible({ timeout: 15000 });
         await saveButton.click();
 
-        await expect(this.page.getByText('Successfully Saved')).toBeVisible({
+        await expect(this.page.locator('.oxd-toast--success')).toBeVisible({
             timeout: 15000,
         });
 
@@ -117,15 +112,15 @@ export class ClaimFormPage {
         await expect(dialog).toBeVisible({ timeout: 30000 });
 
         const filePath = path.resolve(process.cwd(), 'test-data', fileName);
-
         const fileInput = dialog.locator('input[type="file"]');
+
         await fileInput.setInputFiles(filePath);
 
         const saveButton = dialog.getByRole('button', { name: 'Save' });
         await expect(saveButton).toBeVisible({ timeout: 15000 });
         await saveButton.click();
 
-        await expect(this.page.getByText('Successfully Saved')).toBeVisible({
+        await expect(this.page.locator('.oxd-toast--success')).toBeVisible({
             timeout: 15000,
         });
 
@@ -133,13 +128,16 @@ export class ClaimFormPage {
     }
 
     async verifyTotalAmount(expectedAmount: string) {
-        console.log(`[ACTION] Verifying Total Amount matches: ${expectedAmount}`);
+        console.log(`[ACTION] Verifying Total Amount: ${expectedAmount}`);
 
-        const totalAmountText = this.page.locator('p.oxd-text', {
-            hasText: /Total Amount/,
-        });
+        const totalAmountArea = this.page
+            .locator('.orangehrm-card-container, .orangehrm-background-container')
+            .filter({
+                hasText: 'Total Amount',
+            })
+            .first();
 
-        await expect(totalAmountText).toContainText(expectedAmount, {
+        await expect(totalAmountArea).toContainText(expectedAmount, {
             timeout: 30000,
         });
     }
