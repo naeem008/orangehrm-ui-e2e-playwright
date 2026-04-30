@@ -48,14 +48,20 @@ export class LeaveTypeListPage {
     }
 
     async clickEditForLeaveType(leaveName: string) {
-        const targetRow = this.page.getByRole('row', { name: leaveName });
-        await expect(targetRow).toBeVisible({ timeout: 15000 });
+        const targetRow = this.page.locator('.oxd-table-card').filter({
+            hasText: leaveName,
+        });
+
+        await expect(targetRow).toBeVisible({ timeout: 30000 });
         await targetRow.locator('button').nth(1).click();
     }
 
     async clickDeleteForLeaveType(leaveName: string) {
-        const targetRow = this.page.getByRole('row', { name: leaveName });
-        await expect(targetRow).toBeVisible({ timeout: 15000 });
+        const targetRow = this.page.locator('.oxd-table-card').filter({
+            hasText: leaveName,
+        });
+
+        await expect(targetRow).toBeVisible({ timeout: 30000 });
         await targetRow.locator('button').nth(0).click();
     }
 

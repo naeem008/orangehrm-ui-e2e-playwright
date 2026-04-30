@@ -15,8 +15,8 @@ test.describe('Claim - Event Management Update', () => {
         const eventList = new EventListPage(page);
         const eventForm = new EventFormPage(page);
 
-        // 1. SETUP
         const eventData = await createEventSetup(page);
+
         const updatedEventName = `UpdatedEvent_${Date.now()}_${Math.random()
             .toString(36)
             .slice(2, 7)}`;
@@ -25,15 +25,12 @@ test.describe('Claim - Event Management Update', () => {
         console.log(`[SETUP] Base Event Created: ${eventData.eventName}`);
         console.log(`[ACTION] Target Update Name: ${updatedEventName}`);
 
-        // 2. NAVIGATE TO EVENT LIST
         await eventList.navigateToEvents();
 
         console.log(`[ACTION] Locating Event in the grid to Edit: ${eventData.eventName}`);
 
-        // 3. OPEN EDIT FORM
         await eventList.clickEditForEvent(eventData.eventName);
 
-        // 4. UPDATE EVENT NAME
         await expect(eventForm.eventNameInput).toBeVisible({ timeout: 15000 });
         await expect(eventForm.eventNameInput).toHaveValue(eventData.eventName, {
             timeout: 15000,
@@ -47,16 +44,12 @@ test.describe('Claim - Event Management Update', () => {
 
         await eventForm.clickSave();
 
-        // 5. VERIFY SUCCESS MESSAGE
         await expect(page.getByText('Successfully Updated')).toBeVisible({
             timeout: 15000,
         });
 
-        // 6. IMPORTANT FIX:
-        // After update, go back/reload Event list before checking the updated row.
         await eventList.navigateToEvents();
 
-        // 7. VERIFY UPDATED EVENT IN GRID
         const updatedRow = page.locator('.oxd-table-card').filter({
             hasText: updatedEventName,
         });

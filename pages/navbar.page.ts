@@ -30,6 +30,7 @@ export class NavbarPage {
     async logout() {
         await expect(this.userDropdown).toBeVisible({ timeout: 15000 });
         await this.userDropdown.click();
+
         await expect(this.logoutLink).toBeVisible({ timeout: 15000 });
         await this.logoutLink.click();
     }
