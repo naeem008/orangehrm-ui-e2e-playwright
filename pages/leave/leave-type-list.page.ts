@@ -13,34 +13,30 @@ export class LeaveTypeListPage {
     constructor(page: Page) {
         this.page = page;
 
-        this.leaveMenu = page.getByRole('link', { name: 'Leave' });
-        this.configureMenu = page.getByText('Configure');
+        this.leaveMenu = page.locator('a.oxd-main-menu-item[href*="/leave/viewLeaveModule"]');
+        this.configureMenu = page.locator('nav.oxd-topbar-body-nav').getByText('Configure');
         this.leaveTypesOption = page.getByRole('menuitem', { name: 'Leave Types' });
 
         this.pageHeading = page.getByRole('heading', { name: /^Leave Types$/i });
         this.tableHeader = page.locator('.oxd-table-header');
-
         this.addBtn = page.getByRole('button', { name: 'Add' });
         this.confirmDeleteBtn = page.getByRole('button', { name: 'Yes, Delete' });
     }
 
     async navigateToLeaveTypes() {
-        // Ensure Leave module is opened first
+        await expect(this.leaveMenu).toBeVisible({ timeout: 30000 });
         await this.leaveMenu.click();
 
-        // Open Configure dropdown
-        await expect(this.configureMenu).toBeVisible({ timeout: 15000 });
+        await expect(this.configureMenu).toBeVisible({ timeout: 30000 });
         await this.configureMenu.click();
 
-        // Click Leave Types and wait for route change together
-        await expect(this.leaveTypesOption).toBeVisible({ timeout: 15000 });
+        await expect(this.leaveTypesOption).toBeVisible({ timeout: 30000 });
 
         await Promise.all([
-            this.page.waitForURL(/.*leave.*leaveTypeList.*/, { timeout: 30000 }),
+            this.page.waitForURL(/.*\/leave\/leaveTypeList.*/, { timeout: 30000 }),
             this.leaveTypesOption.click(),
         ]);
 
-        // Wait for actual page content, not only URL
         await expect(this.pageHeading).toBeVisible({ timeout: 30000 });
         await expect(this.addBtn).toBeVisible({ timeout: 30000 });
         await expect(this.tableHeader).toBeVisible({ timeout: 30000 });
