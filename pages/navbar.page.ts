@@ -4,6 +4,7 @@ export class NavbarPage {
     readonly page: Page;
     readonly pimMenu: Locator;
     readonly leaveMenu: Locator;
+    readonly claimMenu: Locator;
     readonly userDropdown: Locator;
     readonly logoutLink: Locator;
 
@@ -12,6 +13,7 @@ export class NavbarPage {
 
         this.pimMenu = page.locator('a.oxd-main-menu-item[href*="/pim/viewPimModule"]');
         this.leaveMenu = page.locator('a.oxd-main-menu-item[href*="/leave/viewLeaveModule"]');
+        this.claimMenu = page.locator('a.oxd-main-menu-item[href*="/claim/viewClaimModule"]');
 
         this.userDropdown = page.locator('.oxd-userdropdown-name');
         this.logoutLink = page.getByRole('menuitem', { name: 'Logout' });
@@ -25,6 +27,11 @@ export class NavbarPage {
     async goToLeave() {
         await expect(this.leaveMenu).toBeVisible({ timeout: 30000 });
         await this.leaveMenu.click();
+    }
+
+    async goToClaim() {
+        await expect(this.claimMenu).toBeVisible({ timeout: 30000 });
+        await this.claimMenu.click();
     }
 
     async logout() {

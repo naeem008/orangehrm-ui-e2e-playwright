@@ -1,25 +1,44 @@
-import { Page, expect } from '@playwright/test';
-import { EventListPage } from '../pages/claim/event-list.page';
+import { expect, type Page } from '@playwright/test';
+
 import { EventFormPage } from '../pages/claim/event-form.page';
+import { EventListPage } from '../pages/claim/event-list.page';
+
+function generateUniqueEventName(): string {
+    return `BaseEvent_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
 
 export async function createEventSetup(page: Page) {
     const eventList = new EventListPage(page);
     const eventForm = new EventFormPage(page);
 
-    const uniqueId = Date.now().toString().slice(-4);
-    const eventName = `BaseEvent_${uniqueId}`;
+    const eventName = generateUniqueEventName();
     const description = `Auto-generated setup description for ${eventName}`;
 
-    console.log(`[SETUP] Generating prerequisite Event: ${eventName}`);
+    console.log(`[SETUP] Creating prerequisite Event: ${eventName}`);
 
     await eventList.navigateToEvents();
     await eventList.clickAddEvent();
+
     await eventForm.fillEventDetails(eventName, description);
     await eventForm.clickSave();
 
-    // Ensure save is complete before returning
-    await expect(page.getByText('Successfully Saved')).toBeVisible();
-    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('Successfully Saved')).toBeVisible({
+        timeout: 15000,
+    });
 
-    return { eventName, description };
+    await expect(page.getByText('Successfully Saved'))
+        .toBeHidden({
+            timeout: 30000,
+        })
+        .catch(() => {});
+
+    await eventList.navigateToEvents();
+    await eventList.expectEventVisible(eventName);
+
+    console.log(`[SETUP] Event Created and Verified: ${eventName}`);
+
+    return {
+        eventName,
+        description,
+    };
 }

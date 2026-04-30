@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 import { createEventSetup } from '../../../setups/event.setup';
-import { EventListPage } from '../../../pages/claim/event-list.page';
 import { EventFormPage } from '../../../pages/claim/event-form.page';
+import { EventListPage } from '../../../pages/claim/event-list.page';
 
 test.describe('Claim - Event Management Update', () => {
     test.beforeEach(async ({ page }) => {
@@ -16,17 +16,13 @@ test.describe('Claim - Event Management Update', () => {
         const eventForm = new EventFormPage(page);
 
         const eventData = await createEventSetup(page);
-
-        const updatedEventName = `UpdatedEvent_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        const updatedEventName = `UpdatedEvent_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
         console.log('------------------------------------------------');
         console.log(`[SETUP] Base Event Created: ${eventData.eventName}`);
-        console.log(`[ACTION] Target Update Name: ${updatedEventName}`);
+        console.log(`[ACTION] Updating Event to: ${updatedEventName}`);
 
         await eventList.navigateToEvents();
-
-        console.log(`[ACTION] Locating Event in the grid to Edit: ${eventData.eventName}`);
-
         await eventList.clickEditForEvent(eventData.eventName);
 
         await expect(eventForm.eventNameInput).toBeVisible({ timeout: 15000 });
@@ -46,15 +42,16 @@ test.describe('Claim - Event Management Update', () => {
             timeout: 15000,
         });
 
+        await expect(page.getByText('Successfully Updated'))
+            .toBeHidden({
+                timeout: 30000,
+            })
+            .catch(() => {});
+
         await eventList.navigateToEvents();
+        await eventList.expectEventVisible(updatedEventName);
 
-        const updatedRow = page.locator('.oxd-table-card').filter({
-            hasText: updatedEventName,
-        });
-
-        await expect(updatedRow).toBeVisible({ timeout: 30000 });
-
-        console.log(`[SUCCESS] Successfully updated and verified in grid: ${updatedEventName}`);
+        console.log(`[SUCCESS] Event updated and verified: ${updatedEventName}`);
         console.log('------------------------------------------------');
     });
 });
