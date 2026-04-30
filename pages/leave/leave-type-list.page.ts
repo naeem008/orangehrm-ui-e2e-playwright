@@ -1,6 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
-
 export class LeaveTypeListPage {
     readonly page: Page;
     readonly leaveMenu: Locator;
