@@ -13,7 +13,6 @@ export default defineConfig({
     workers: isCI ? 2 : 1,
     retries: isCI ? 1 : 0,
 
-
     timeout: 60000,
     expect: {
         timeout: 15000, // Maximum time expect() should wait (increased from default 5s to 15s)
@@ -38,11 +37,9 @@ export default defineConfig({
         trace: 'retain-on-failure',
         video: 'retain-on-failure',
 
-
         actionTimeout: 30000,
         navigationTimeout: 30000,
     },
-
 
     globalSetup: './scripts/global-setup.ts',
     globalTeardown: './scripts/global-teardown.ts',
